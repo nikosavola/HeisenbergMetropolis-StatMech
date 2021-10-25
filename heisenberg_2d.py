@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from numba import njit
 
 np.random.seed(444222)
 
@@ -10,6 +11,7 @@ def initialize(N):
 
 
 ## metropolis-hastings step to determine a random spin to flip and see if the flip is valid
+@njit(fastmath=True)
 def metropolis(grid, beta, H):
     N = grid.shape[0]
     for _ in range(N * N):
@@ -27,6 +29,7 @@ def metropolis(grid, beta, H):
 
 
 ## compute the energy of the current spin configuration
+@njit(fastmath=True)
 def energy(grid, H):
     E = 0
     N = grid.shape[0]
@@ -37,6 +40,7 @@ def energy(grid, H):
     return 1.0 * E / 4  ## avoid overcounting
 
 
+@njit(fastmath=True)
 def magnetization(grid):
     return np.sum(grid)
 
