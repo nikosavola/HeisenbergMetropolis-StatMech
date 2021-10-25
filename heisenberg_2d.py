@@ -44,7 +44,7 @@ def magnetization(grid):
 def plot_system(grid, t, T, H):
     fig = plt.figure(t + 1, figsize=(12, 8))
     plt.imshow(np.copy(grid), interpolation='nearest', cmap='binary', vmin=-1, vmax=1, origin='lower')
-    plt.title("System at time={}, T={:.2f}, external field H={:.2f}".format(t, T, H))
+    plt.title(f"System at time={t}, T={T:.2f}, external field H={H:.2f}")
     plt.grid()
 
     ## uncomment if you want to save the system configurations
