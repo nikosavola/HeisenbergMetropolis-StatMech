@@ -7,7 +7,30 @@ np.random.seed(444222)
 
 ## initialize a random grid of spins of -1 and 1
 def initialize(N):
-    return 2 * np.random.randint(2, size=(N, N)) - 1
+    return np.random.uniform(low=-1.0, high=1.0, size=(N, N, 3))
+
+
+@njit(fastmath=True)
+def symmetric_spin(s):
+    """
+    Ensure that the change in a spin direction is symmetrically
+    distributed around the current spin direction.
+
+    Args:
+        s (1x3 ndarray): spin s_i
+
+    Returns:
+        ds: the nudge to spin s_i
+    """
+    # Numba does not support the size-argument
+    ds = np.array([np.random.uniform(-1.0, 1.0) for _ in range(3)])
+    ds_max = np.max(np.abs(s - ds))
+
+    while np.linalg.norm(ds) > ds_max:
+        ds = np.array([np.random.uniform(-1.0, 1.0) for _ in range(3)])
+        ds_max = np.max(np.abs(s - ds))
+
+    return ds
 
 
 ## metropolis-hastings step to determine a random spin to flip and see if the flip is valid
@@ -16,14 +39,17 @@ def metropolis(grid, beta, H):
     N = grid.shape[0]
     for _ in range(N * N):
         pos = np.random.randint(0, N, size=2)
-        nbrs = grid[(pos[0] + 1) % N, pos[1]] + grid[(pos[0] - 1) % N, pos[1]] + grid[pos[0], (pos[1] + 1) % N] + grid[
-            pos[0], (pos[1] - 1) % N]
+        nbrs = grid[(pos[0] + 1) % N, pos[1]] + grid[(pos[0] - 1) % N, pos[1]] + \
+               grid[pos[0], (pos[1] + 1) % N] + grid[pos[0], (pos[1] - 1) % N]
 
-        dE = 2 * grid[pos[0], pos[1]] * (nbrs + H)
+        dE = np.sum(2 * grid[pos[0], pos[1]] * (nbrs + H))
 
         ## flip if dE<0 or with prob exp^(-dE*beta)
         if dE < 0 or np.random.rand() < np.exp(-dE * beta):
-            grid[pos[0], pos[1]] *= -1
+            s = grid[pos[0], pos[1]]
+            proposal = s + symmetric_spin(s)
+            proposal = proposal / np.linalg.norm(proposal)
+            grid[pos[0], pos[1]] = proposal
 
     return grid
 
@@ -36,7 +62,7 @@ def energy(grid, H):
     for x in range(N):
         for y in range(N):
             nbrs = grid[(x + 1) % N, y] + grid[(x - 1) % N, y] + grid[x, (y + 1) % N] + grid[x, (y - 1) % N]
-            E -= (nbrs + H) * grid[x, y]
+            E -= np.sum((nbrs + H) * grid[x, y])
     return 1.0 * E / 4  ## avoid overcounting
 
 
