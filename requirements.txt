@@ -6,3 +6,4 @@ pandas
 pylint
 pytest
 scipy
+tqdm
