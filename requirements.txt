@@ -1,3 +1,4 @@
+ipywidgets
 matplotlib
 nbval
 numba
