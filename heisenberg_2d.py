@@ -63,7 +63,7 @@ def energy(grid, H):
         for y in range(N):
             nbrs = grid[(x + 1) % N, y] + grid[(x - 1) % N, y] + grid[x, (y + 1) % N] + grid[x, (y - 1) % N]
             E -= np.sum((nbrs + H) * grid[x, y])
-    return 1.0 * E / 4  ## avoid overcounting
+    return 1.0 * E / 6  ## avoid overcounting
 
 
 @njit(fastmath=True)
