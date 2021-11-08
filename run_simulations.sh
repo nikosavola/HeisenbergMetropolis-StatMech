@@ -2,9 +2,9 @@
 
 module -q load anaconda
 
-Ns=(10 25 50) # Our sizes for lattice
-Hs=(1)
-stepss=(2000)
+Ns=(8 16 32 48 64) # Our sizes for lattice
+Hs=(0 1 2)
+stepss=(3000)
 n_temps=(200)
 t_start=0.3
 t_end=10.5
