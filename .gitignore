@@ -1,5 +1,5 @@
 # Simulation results
-/results
+#/results
 *.pdf
 *.png
 *.jpg
