@@ -8,8 +8,18 @@ from socket import gethostname
 
 import numpy as np
 import matplotlib.pyplot as plt
-from tqdm.notebook import tqdm
+
 from numba import njit
+
+# import correct tqdm version if inside Jupyter notebook
+try:
+    shell = get_ipython().__class__.__name__
+    if shell == 'ZMQInteractiveShell':
+        from tqdm.notebook import tqdm
+    else:
+        from tqdm import tqdm
+except NameError:
+    from tqdm import tqdm
 # -
 
 np.random.seed(444222)
