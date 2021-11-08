@@ -51,4 +51,4 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Run pylint
-        run: pylint heisenberg_2d.py
+        run: pylint heisenberg_2d.py run_heisenberg.py

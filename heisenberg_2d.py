@@ -1,14 +1,12 @@
 # +
 import multiprocessing
-import sys
 import os
+from socket import gethostname
 from time import time
 from typing import Tuple
-from socket import gethostname
 
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
 from numba import njit
 
 # import correct tqdm version if inside Jupyter notebook
@@ -20,7 +18,6 @@ try:
         from tqdm import tqdm
 except NameError:
     from tqdm import tqdm
-# -
 
 np.random.seed(444222)
 
@@ -91,7 +88,6 @@ def magnetization(grid):
     return np.sum(grid)
 
 
-# +
 def plot_system(grid, t, T, H):
     fig = plt.figure(t + 1, figsize=(12, 8))
     plt.imshow(np.copy(grid), interpolation='nearest', cmap='binary', vmin=-1, vmax=1, origin='lower')
@@ -105,79 +101,75 @@ def plot_system(grid, t, T, H):
 
 
 def _start(settings: Tuple):
-        """ Run the routine for temperature input (temp, N, H, steps) and return E, M, C, X"""
-        T, N, H, steps = settings
-        snaps = []
-            
-        # for ii, T in enumerate(temp):
-        E1=0
-        M1=0
-        E2=0
-        M2=0
-        grid = initialize(N) ## get the initial configuration
-        beta = 1.0/T ## k_B = 1  
+    """ Run the routine for temperature input (temp, N, H, steps) and return E, M, C, X"""
+    T, N, H, steps = settings
+    snaps = []
 
-        ## parameters to calculate running average (notice that these are averages per spin)
-        n1 = 1.0/(steps*N*N)
-        n2 = 1.0/(steps*steps*N*N)
+    # for ii, T in enumerate(temp):
+    E1 = 0
+    M1 = 0
+    E2 = 0
+    M2 = 0
+    grid = initialize(N)  ## get the initial configuration
+    beta = 1.0 / T  ## k_B = 1
 
-        ## first we equilibrate the system 
-        ## (assumption is that snapshots are wanted here)
+    ## parameters to calculate running average (notice that these are averages per spin)
+    n1 = 1.0 / (steps * N * N)
+    n2 = 1.0 / (steps * steps * N * N)
+
+    ## first we equilibrate the system
+    ## (assumption is that snapshots are wanted here)
+    for t in range(steps):
+        if t in snaps:
+            plot_system(grid, t, T, H)
+
+        metropolis(grid, beta, H)
+
+    ## then we start to actually collect data, if we aren't just plotting snapshots
+    if len(snaps) == 0:
         for t in range(steps):
-            if t in snaps:
-                plot_system(grid, t, T, H)
-
             metropolis(grid, beta, H)
+            tE = energy(grid, H)
+            tM = magnetization(grid)
 
-        ## then we start to actually collect data, if we aren't just plotting snapshots
-        if len(snaps)==0:
-            for t in range(steps):
-                metropolis(grid, beta, H)
-                tE = energy(grid, H)
-                tM = magnetization(grid)
+            E1 += tE
+            E2 += tE * tE
+            M1 += tM
+            M2 += tM * tM
 
-                E1 += tE
-                E2 += tE*tE
-                M1 += tM
-                M2 += tM*tM
+        E = n1 * E1
+        M = n1 * M1
+        C = beta * beta * (n1 * E2 - n2 * E1 * E1)
+        X = beta * (n1 * M2 - n2 * M1 * M1)
 
-            E = n1*E1
-            M = n1*M1
-            C = beta*beta*(n1*E2 - n2*E1*E1)
-            X = beta*(n1*M2 - n2*M1*M1)
+    return E, M, C, X
 
-        return E, M, C, X
-    
 
 def run_simulation(N: float, H: float, steps: float, temp: np.ndarray):
     """
     Run the Metropolis-Hastings algorithm for the 2D lattice of 3D spins with the given settings.
-    
-    `n_temp` is inferred from len(temp)
-    
+    `n_temp` is inferred from len(temp).
+
     Arguments:
         N: size of lattice
         H: external magnetic field
         steps: number of steps to take for equilibrium
         temp: list of temperatures to run simulation for
-    
+
     Returns:
         (E, M, C, X, wall_time):
             Energy, magnetisation, specific heat, susceptibility as vectors for temp.
             wall_time given as scalar of seconds taken for computation.
-        
     """
-    data_path = './results'
     n_temp = len(temp)
 
     ## small sanity check on input parameters
-    if N<2 or steps<1 or temp[0]<0:
+    if N < 2 or steps < 1 or temp[0] < 0:
         raise ValueError("Invalid command line parameters")
-
 
     # Run the routine in parallel (NB: might not work on windows)
     t0 = time()
-    
+
     settings = [(T, N, H, steps) for T in temp]
 
     # Run without parallel processing if on Windows
@@ -192,6 +184,5 @@ def run_simulation(N: float, H: float, steps: float, temp: np.ndarray):
 
     wall_time = time() - t0
     print(f'Took {wall_time} s')
-    
-    
+
     return E, M, C, X, wall_time
