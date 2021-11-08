@@ -2,19 +2,17 @@
 
 module -q load anaconda
 
-# +
 Ns=(8 16 32 48 64) # Our sizes for lattice
 
-Hxs=(0 1 1)
-Hys=(0.10 0 1)
-Hzs=(0.75 0 1)
+Hxs=(0 1 1 0)
+Hys=(0.5 0 1 0)
+Hzs=(0.86 0 1 0)
 
-stepss=(3000)
+stepss=(4000)
 
-n_temps=(200)
-t_start=0.3
-t_end=10.5
-# -
+n_temps=(400)
+t_start=0.2
+t_end=10
 
 for n_temp in ${n_temps[@]}
 do
