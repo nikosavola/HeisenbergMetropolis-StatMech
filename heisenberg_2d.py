@@ -145,14 +145,14 @@ def _start(settings: Tuple):
     return E, M, C, X
 
 
-def run_simulation(N: float, H: float, steps: float, temp: np.ndarray):
+def run_simulation(N: float, H: np.ndarray, steps: float, temp: np.ndarray):
     """
     Run the Metropolis-Hastings algorithm for the 2D lattice of 3D spins with the given settings.
     `n_temp` is inferred from len(temp).
 
     Arguments:
         N: size of lattice
-        H: external magnetic field
+        H: external magnetic field, e.g., [0, 0.5, 0.5]
         steps: number of steps to take for equilibrium
         temp: list of temperatures to run simulation for
 

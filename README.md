@@ -21,7 +21,7 @@ pip install -r requirements.txt
 
 Simulations can be run independently with e.g.
 ```bash
-python3 run_heisenberg.py --N 10 --H 1 --steps 4000 --temp 0.3 10.5 500
+python3 run_heisenberg.py --N 10 --H 0 0.25 0.75 --steps 4000 --temp 0.3 10.5 500
 ```
 The parameters can in turn be effortlessly swept with something like the Bash-script given as an example [`run_simulations.sh`](run_simulations.sh):
 ```bash

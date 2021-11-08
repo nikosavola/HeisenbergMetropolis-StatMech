@@ -12,11 +12,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--temp', nargs="+", metavar='float', type=float)
     parser.add_argument('--N', metavar='int', type=int)
-    parser.add_argument('--H', metavar='int', type=int)
+    parser.add_argument('--H', nargs="+", metavar='float', type=float)
     parser.add_argument('--steps', metavar='int', type=int)
 
     args = parser.parse_args()
-    N, H, steps, temp = args.N, args.H, args.steps, args.temp
+    N, H, steps, temp = args.N, np.array(args.H), args.steps, args.temp
     print(args)
 
     temp = np.linspace(temp[0], temp[1], int(temp[2]))
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     # gather results in a table just in case
     df = pd.DataFrame(results, columns=['E', 'M', 'C', 'X'])
     df['temp'] = temp
-    for name, var in zip(['n_temp', 'N', 'steps', 'H', 'wall_time'], [n_temp, N, steps, H, wall_time]):
+    for name, var in zip(['n_temp', 'N', 'steps', 'H', 'wall_time'], [n_temp, N, steps, [H] * n_temp, wall_time]):
         df[name] = var
 
     # save the table
