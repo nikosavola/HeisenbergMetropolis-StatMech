@@ -6,6 +6,8 @@
 
 This repository contains source code for a computational project on the classical Heisenberg model in two dimensions using a standard Monte Carlo Metropolis algorithm for the Ising model.
 
+A report can be found in thu `gh-pages` branch [here](https://github.com/nikosavola/HeisenbergMetropolis-StatMech/blob/gh-pages/main.pdf).
+
 Project is done for the Aalto University course [PHYS-E0415 Statistical Mechanics](https://courses.aalto.fi/courses/s/course/a053X000012QxjCQAS/statistical-mechanics-d?language=en_US).
 
 ## Installation

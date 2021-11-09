@@ -7,6 +7,7 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v2
         with:
+          token: ${{ secrets.MY_REPO_PAT }}
           submodules: recursive
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v2
@@ -21,7 +22,7 @@ jobs:
         if: always()
         with:
           name: PDF
-          path: main.pdf
+          path: ./tex/main.pdf
       - name: Serve LaTeX document
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.ref == 'refs/heads/main' }}
